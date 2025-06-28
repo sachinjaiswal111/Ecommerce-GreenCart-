@@ -20,7 +20,7 @@ await connectCloudinary()
 
 
 
-const allowedOrigins=['http://localhost:5173']
+const allowedOrigins=['https://green-cart-frontend-nine.vercel.app']
 
 // Middleware configration
 
