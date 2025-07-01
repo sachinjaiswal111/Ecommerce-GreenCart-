@@ -6,7 +6,8 @@ logs
 *.log
 
 # Environment variables
-.env
+server/.env
+client/.env
 
 # Build files
 dist/
