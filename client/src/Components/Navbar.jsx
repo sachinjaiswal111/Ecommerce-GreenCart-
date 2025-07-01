@@ -79,11 +79,11 @@ function Navbar() {
                 <NavLink to='/' onClick={() => { setOpen(false) }}>Home</NavLink>
                 <NavLink to='/products' onClick={() => { setOpen(false) }}>All Prouducts</NavLink>
                 {user &&
-                    <div >
+                    
                         <NavLink to='/products' onClick={() => { setOpen(false) }}>My Orders</NavLink>
-                        <br />
-                    <NavLink to='/cart' onClick={() => { setOpen(false) }}>My Cart</NavLink>
-                    </div>
+                }
+                {user && 
+                 <NavLink to='/cart' onClick={() => { setOpen(false) }}>My Cart</NavLink>
                 }
                 <NavLink to='/' onClick={() => { setOpen(false) }}>Contact</NavLink>
 
