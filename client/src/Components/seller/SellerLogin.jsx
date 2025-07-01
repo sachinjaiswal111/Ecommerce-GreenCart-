@@ -17,7 +17,7 @@ function SellerLogin() {
     const onSubmitHandler=async(e)=>{
         try{
           e.preventDefault();
-          const {data}= await axios.post('/api/v1/seller/login',{email,password});
+          const {data}= await axios.post('/api/v1/seller/login',{email,password},{withCredentials: true});
           if(data.success){
             setIsSeller(true);
             navigate('/seller')
