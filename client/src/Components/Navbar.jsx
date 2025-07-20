@@ -41,7 +41,7 @@ function Navbar() {
                 <NavLink to='/'>Home</NavLink>
                 <NavLink to='/products'>All products</NavLink>
                 <NavLink to='/'>Contact</NavLink>
-
+                <NavLink to='/seller'>seller-Login</NavLink>
                 <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
                     <input className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500" type="text" placeholder="Search products"
                     onChange={(e)=>setSearchQuery(e.target.value)} />
