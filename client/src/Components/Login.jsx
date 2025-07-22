@@ -13,6 +13,7 @@ function Login() {
                 event.preventDefault();
 
                 const{data}=await axios.post(`/api/v1/user/${state}`,{name,email,password});
+                console.log(data);
                 if(data.success){
                     navigate('/')
                     scrollTo(0,0)
@@ -32,7 +33,8 @@ function Login() {
                 
 
             } catch (error) {
-                toast.error(error.message)
+           const message = error.response?.data?.message || "Something went wrong";
+           toast.error(message);
             }
            
             

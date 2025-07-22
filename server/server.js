@@ -20,7 +20,7 @@ await connectCloudinary()
 
 
 
-const allowedOrigins=["https://ecommerce-green-cart-soo1.vercel.app"]
+const allowedOrigins=["https://ecommerce-green-cart-soo1.vercel.app",'http://localhost:5173']
 
 // Middleware configration
 

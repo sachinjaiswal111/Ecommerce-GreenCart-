@@ -9,70 +9,151 @@ import toast from "react-hot-toast"
 const Cart = () => {
 
 
-    const { cartItems,setcartItems, products, currency, removeFromCart, getCartCount, updateCartItem, navigate, getCartAmount,addToCart,axios,user} = useAppContext()
+    const { cartItems, setcartItems, products, currency, removeFromCart, getCartCount, updateCartItem, navigate, getCartAmount, addToCart, axios, user } = useAppContext()
     const [cartArray, setCartArray] = useState([])
     const [address, setAddress] = useState([])
     const [showAddress, setShowAddress] = useState(false)
-    const [selectedAddress, setSelectedAdress] = useState(dummyAddress[0]);
+    const [selectedAddress, setSelectedAdress] = useState(address[0]);
     const [paymentOption, setPaymentOption] = useState("COD")
     const getCart = () => {
         let tempArray = [];
         for (const key in cartItems) {
             const product = products.find((item) => item._id === key)
-           product.quantity=cartItems[key]
-           
+            product.quantity = cartItems[key]
+
             tempArray.push(product)
         }
         setCartArray(tempArray);
-        
+
 
 
     }
-    const getUserAddress = async ()=>{
-        try{
-            const{data}= await axios.get('/api/v1/address/get')
-        if(data.success){
-            setAddress(data.addresses)
-        }else{
-            toast.error(data.message)
-        }
-        }catch(e){
+    const getUserAddress = async () => {
+        try {
+            const { data } = await axios.get('/api/v1/address/get')
+            if (data.success) {
+                setAddress(data.addresses)
+            } else {
+                toast.error(data.message)
+            }
+        } catch (e) {
             toast.error(e.message)
         }
 
     }
     useEffect(() => {
-            if (products.length > 0 && cartItems) {
-                getCart()
-                getUserAddress()
-            }
-        }, [products, cartItems])
-   
+        if (products.length > 0 && cartItems) {
+            getCart()
+            getUserAddress()
+        }
+    }, [products, cartItems])
+
     const placeOrder = async () => {
-        try{
-            if(!selectedAddress){
+        try {
+            if (!selectedAddress) {
                 return toast.error("Please select an address");
             }
-            if(paymentOption==="COD"){
-                const{data}= await axios.post('/api/v1/order/cod',{
-                    userId:user._id,
-                    items:cartArray.map(item=>({product:item._id,quantity:item.quantity})),
-                    address:selectedAddress._id
+            if (paymentOption === "COD") {
+                const { data } = await axios.post('/api/v1/order/cod', {
+                    userId: user._id,
+                    items: cartArray.map(item => ({ product: item._id, quantity: item.quantity })),
+                    address: selectedAddress._id
                 })
-                
-                if(data.success){
+
+                if (data.success) {
                     toast.success(data.message)
                     setcartItems({})
                     navigate('/my-orders')
-                }else{
+                } else {
+                    toast.error(data.message)
+                }
+                if (data.success) {
+                    toast.success(data.message)
+                    setcartItems({})
+                    navigate('/my-orders')
+                } else {
                     toast.error(data.message)
                 }
             }
-        }catch(error){
+
+            if (paymentOption === "Online") {
+                const { data} = await axios.post('/api/v1/order/Online', {
+                    userId: user._id,
+                    items: cartArray.map(item => ({ product: item._id, quantity: item.quantity })),
+                    address: selectedAddress._id
+                })
+                console.log(data);
+                var options = {
+                    "key": "rzp_test_SPPIQzyJYusVMp", // Enter the Key ID generated from the Dashboard
+                    "amount": data.order.amount, // Amount is in currency subunits.
+                    "currency": data.order.currency,
+                    "name": "green-cart", //your business name
+                    "description": "Test Transaction",
+                    "image": "https://example.com/your_logo",
+                    "order_id": data.order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                    "handler": async function (response) {
+                        // alert(response.razorpay_payment_id);
+                        // alert(response.razorpay_order_id);
+                        // alert(response.razorpay_signature)
+                        const res = await axios.post('/api/v1/order/validate', {
+                            userId: user._id,
+                            items: cartArray.map(item => ({ product: item._id, quantity: item.quantity })),
+                            address: selectedAddress._id,
+                            price: data.order.amount / 100,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature
+
+
+                        })
+                        console.log(res);
+                        if (res.data.success) {
+                            toast.success(res.data.message)
+                            setcartItems({})
+                            navigate('/my-orders')
+                        } else {
+                            toast.error(data.message)
+                        }
+
+                    },
+                    "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+                        "name": "sachin kumar", //your customer's name
+                        "email": "example@example.com",
+                        "contact": "+919122890105"  //Provide the customer's phone number for better conversion rates 
+                    },
+                    "notes": {
+                        "address": "Razorpay Corporate Office"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                var rzp1 = new window.Razorpay(options);
+                rzp1.on('payment.failed', function (response) {
+                    toast.error(response.error.description);
+                    // alert(response.error.description);
+                    // alert(response.error.source);
+                    // alert(response.error.step);
+                    // alert(response.error.reason);
+                    // alert(response.error.metadata.order_id);
+                    // alert(response.error.metadata.payment_id);
+                });
+                rzp1.open();
+
+
+                // if (data1.success) {
+                //     toast.success(data.message)
+                //     setcartItems({})
+                //     navigate('/my-orders')
+                // } else {
+                //     toast.error(data.message)
+                // }
+            }
+        } catch (error) {
             console.log(error)
             toast.error(error.message)
 
-    }
+        }
 
     }
     return (products.length > 0 && cartItems) ? (
@@ -88,40 +169,40 @@ const Cart = () => {
                     <p className="text-center">Action</p>
                 </div>
 
-               <div>
-                 {cartArray.map((product, index) => (
-                    <div key={index} className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 items-center text-sm md:text-base font-medium pt-3">
-                        <div className="flex items-center md:gap-6 gap-3">
-                            <div className="cursor-pointer w-24 h-24 flex items-center justify-center border border-gray-300 rounded"
-                                onClick={() => {
-                                    navigate(`/product/${product.category}/${product._id}`)
-                                    scrollTo(0, 0)
-                                }}>
-                                <img className="max-w-full h-full object-cover" src={product.image[0]} alt={product.name} />
-                            </div>
-                            <div>
-                                <p className="hidden md:block font-semibold">{product.name}</p>
-                                <div className="font-normal text-gray-500/70">
-                                    <p>Weight: <span>{product.weight || "N/A"}</span></p>
-                                    <div className='flex items-center'>
-                                        <p>Qty:</p>
-                                        <select className='outline-none' onChange={()=>addToCart(product._id)} >
-                                            {Array(cartItems[product._id] > 9 ? cartItems[product._id] : 9).fill('').map((_, index) => (
-                                                <option key={index} value={product.quantity }>{index + 1}</option>
-                                            ))}
-                                        </select>
+                <div>
+                    {cartArray.map((product, index) => (
+                        <div key={index} className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 items-center text-sm md:text-base font-medium pt-3">
+                            <div className="flex items-center md:gap-6 gap-3">
+                                <div className="cursor-pointer w-24 h-24 flex items-center justify-center border border-gray-300 rounded"
+                                    onClick={() => {
+                                        navigate(`/product/${product.category}/${product._id}`)
+                                        scrollTo(0, 0)
+                                    }}>
+                                    <img className="max-w-full h-full object-cover" src={product.image[0]} alt={product.name} />
+                                </div>
+                                <div>
+                                    <p className="hidden md:block font-semibold">{product.name}</p>
+                                    <div className="font-normal text-gray-500/70">
+                                        <p>Weight: <span>{product.weight || "N/A"}</span></p>
+                                        <div className='flex items-center'>
+                                            <p>Qty:</p>
+                                            <select className='outline-none' onChange={() => addToCart(product._id)} >
+                                                {Array(cartItems[product._id] > 9 ? cartItems[product._id] : 9).fill('').map((_, index) => (
+                                                    <option key={index} value={product.quantity}>{index + 1}</option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <p className="text-center">{currency}{product.offerPrice * product.quantity}</p>
-                        <button className="cursor-pointer mx-auto"
-                            onClick={() => removeFromCart(product._id)}>
-                            <img className="inline-block w-6 h-6" src={assets.remove_icon} alt="remove" />
-                        </button>
-                    </div>)
-                )}
-               </div>
+                            <p className="text-center">{currency}{product.offerPrice * product.quantity}</p>
+                            <button className="cursor-pointer mx-auto"
+                                onClick={() => removeFromCart(product._id)}>
+                                <img className="inline-block w-6 h-6" src={assets.remove_icon} alt="remove" />
+                            </button>
+                        </div>)
+                    )}
+                </div>
 
                 <button className="group cursor-pointer flex items-center mt-8 gap-2 text-indigo-500 font-medium"
                     onClick={() => {
@@ -180,7 +261,7 @@ const Cart = () => {
                     </p>
                     <p className="flex justify-between">
                         <span>Tax (2%)</span>
-                        <span>{currency}{getCartAmount()* 2 / 100}</span>
+                        <span>{currency}{getCartAmount() * 2 / 100}</span>
                     </p>
                     <p className="flex justify-between text-lg font-medium mt-3">
                         <span>Total Amount:</span>
@@ -188,16 +269,16 @@ const Cart = () => {
                             {getCartAmount() + getCartAmount() * 2 / 100}
                         </span>
                     </p>
-                    
-                    
-                
 
-                <button className="w-full py-3 mt-6 cursor-pointer bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition"
-                    onClick={placeOrder}>
-                    {
-                        paymentOption === 'COD' ? "Place Order" : "Proceed to Checkout"
-                    }
-                </button>
+
+
+
+                    <button className="w-full py-3 mt-6 cursor-pointer bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition"
+                        onClick={placeOrder}>
+                        {
+                            paymentOption === 'COD' ? "Place Order" : "Proceed to Checkout"
+                        }
+                    </button>
                 </div>
             </div>
         </div>
