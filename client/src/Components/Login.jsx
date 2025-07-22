@@ -13,7 +13,7 @@ function Login() {
                 event.preventDefault();
 
                 const{data}=await axios.post(`/api/v1/user/${state}`,{name,email,password});
-                console.log(data);
+               
                 if(data.success){
                     navigate('/')
                     scrollTo(0,0)

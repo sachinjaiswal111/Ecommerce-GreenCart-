@@ -102,6 +102,7 @@ export const login = async (req, res) => {
       success: true,
       user: user.email,
       name: user.name,
+      message:"Logged in successfully"
     });
 
   } catch (error) {
