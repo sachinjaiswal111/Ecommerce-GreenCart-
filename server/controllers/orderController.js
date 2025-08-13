@@ -186,7 +186,7 @@ export const getUserOrders= async(req,res)=>{
 
 export const getAllOrders = async (req,res)=>{
     try{
-       
+       const {userId}= req.body;
         const orders = await Order.find({
             userId,
             $or:[{paymentType:"COD"},{isPaid:true}]
