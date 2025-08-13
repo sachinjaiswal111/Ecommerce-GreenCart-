@@ -10,6 +10,7 @@ function Order() {
     const fetchOrder = async () => {
    try {
       const { data } = await axios.get('/api/v1/order/seller', { withCredentials: true });
+      console.log(data);
       if (data.success) {
          setOrders(data.orders);
          toast.success(data.message);
@@ -43,11 +44,11 @@ function Order() {
                     </div>
 
                     <div className="text-sm md:text-base text-black/60">
-                        <p className='text-black/80'>{order.address.firstName} {order.address.lastName}</p>
+                        <p className='text-black/80'>{dummyAddress.address.firstName} {dummyAddress.address.lastName}</p>
 
-                        <p>{order.address.street}, {order.address.city}</p><p> {order.address.state},{order.address.zipcode}, {order.address.country}</p>
+                        <p>{dummyAddress.address.street}, {dummyAddress.address.city}</p><p> {dummyAddress.address.state},{dummyAddress.address.zipcode}, {dummyAddress.address.country}</p>
                         <p></p>
-                        <p>{order.address.state}</p>
+                        <p>{dummyAddress.address.state}</p>
                     </div>
 
                     <p className="font-medium text-large my-auto ">{currency}{order.amount}</p>

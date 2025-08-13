@@ -12,8 +12,6 @@ export const addAddress= async(req,res)=>{
     }catch(e){
         console.log(e.message)
         res.json({success:false,message:e.message});
-        
-
     }
 }
 
