@@ -163,9 +163,9 @@ export const validate = async(req,res)=>{
 
 export const getUserOrders= async(req,res)=>{
     try{
-        const {userId}= req.body;
+        
         const orders = await Order.find({
-            userId,
+            
             $or:[{paymentType:"COD"},{isPaid:true}]
         }).populate("items.product address").sort({createdAt:-1})
 
