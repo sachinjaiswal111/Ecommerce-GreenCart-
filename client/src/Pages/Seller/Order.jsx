@@ -4,13 +4,24 @@ import { assets, dummyAddress, dummyOrders } from '../../assets/assets';
 
 function Order() {
     const{currency }=useAppContext()
-    const[orders,setOrders]=useState([])
-    const fetchOrder= async()=>{
-        setOrders(dummyOrders)
-    }
+    const[orders,setOrders]=useState([]);
+    const {axios}=useAppContext()
+    const fetchOrder = async () => {
+   try {
+      const { data } = await axios.get('/api/v1/order/seller', { withCredentials: true });
+      if (data.success) {
+         setOrders(data.orders);
+         toast.success(data.message);
+      } else {
+         toast.error(data.message);
+      }
+   } catch (e) {
+      toast.error(e.message);
+   }
+}
     useEffect(()=>{
         fetchOrder()
-    })
+    },[])
   return (
         <div className='no-scrollbar flex-1 h-[95vh] overflow-y-scroll'>
             <div className="md:p-10 p-4 space-y-4">
